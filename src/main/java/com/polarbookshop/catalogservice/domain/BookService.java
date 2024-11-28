@@ -1,6 +1,7 @@
 package com.polarbookshop.catalogservice.domain;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookService {
@@ -11,17 +12,21 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Book> viewBookList() {
         Iterable<Book> all = bookRepository.findAll();
         all.forEach(book -> System.out.println(book));
         return all;
     }
 
+    @Transactional(readOnly = true)
     public Book viewBookDetails(String isbn) {
+        System.out.println("isbn : " + isbn);
         return bookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
     }
 
+    @Transactional
     public Book addBookToCatalog(Book book) {
         if (bookRepository.existsByIsbn(book.isbn())) {
             throw new BookAlreadyExistsException(book.isbn());
@@ -29,10 +34,12 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    @Transactional
     public void removeBookFromCatalog(String isbn) {
         bookRepository.deleteByIsbn(isbn);
     }
 
+    @Transactional
 	public Book editBookDetails(String isbn, Book book) {
 		return bookRepository.findByIsbn(isbn)
 				.map(existingBook -> {
