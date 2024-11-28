@@ -12,7 +12,9 @@ public class BookService {
     }
 
     public Iterable<Book> viewBookList() {
-        return bookRepository.findAll();
+        Iterable<Book> all = bookRepository.findAll();
+        all.forEach(book -> System.out.println(book));
+        return all;
     }
 
     public Book viewBookDetails(String isbn) {
